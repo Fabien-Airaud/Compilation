@@ -6,6 +6,7 @@ import arbre_abstrait
 class FloParser(Parser):
 	# On récupère la liste des lexèmes de l'analyse lexicale
 	tokens = FloLexer.tokens
+	debugfile = 'parser.out'
 
 	# Règles gramaticales et actions associées
 
@@ -50,7 +51,7 @@ class FloParser(Parser):
 
 if __name__ == '__main__':
 	lexer = FloLexer()
-	parser = FloParser()
+	parser = FloParser().debugfile
 	if len(sys.argv) < 2:
 		print("usage: python3 analyse_syntaxique.py NOM_FICHIER_SOURCE.flo")
 	else:
