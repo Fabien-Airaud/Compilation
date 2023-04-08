@@ -25,36 +25,8 @@ class FloLexer(Lexer):
 	EGAL = r"=="
 	PAS_EGAL = r"!="
 
-	# Conditions et boucle:
-	CONDITION_SINON_SI = r"sinon\ si" # Mis en n°1 car si on met si ou sinon devant, il detectera pas la condition 
-	CONDITION_SINON = r"sinon" # Mis en n°2 car dans sinon il y a "si" donc il detectera pas si on l'aurais mis en n°3 
-	CONDITION_SI = r"si"
-	TANT_QUE = r"tantque"
-
-	# Retour:
-	RETOURNER = r"retourner" # Mis à cet emplacement là pour pas que le "et" enleve sa détection
-
-	# Logique :
-	ET = r"et"
-	OU = r"ou"
-	NON = r"non"
 
 	# Type :
-	# Ce regex permet de separer les variable et les types
-	@_(r'\(?entier\ ')
-	def TYPE_ENTIER(self, t):
-		if(t.value[0] == '('):
-			t.value = t.value[1:]
-		t.value = t.value[:-1]
-		return t
-
-	@_(r'\(?booleen\ ')
-	def TYPE_BOOLEEN(self, t):
-		if(t.value[0] == '('):
-			t.value = t.value[1:]
-		t.value = t.value[:-1]
-		return t
-
 	@_(r'0|[1-9][0-9]*')
 	def ENTIER(self, t):
 		t.value = int(t.value)
@@ -72,8 +44,27 @@ class FloLexer(Lexer):
 	IDENTIFIANT = r'[a-zA-Z][a-zA-Z0-9_]*' #en général, variable ou nom de fonction
 
 	# cas spéciaux:
-	IDENTIFIANT['ecrire'] = ECRIRE
-	IDENTIFIANT['lire'] = LIRE
+	IDENTIFIANT["ecrire"] = ECRIRE
+	IDENTIFIANT["lire"] = LIRE
+
+	# Type:
+	IDENTIFIANT["entier"] = TYPE_ENTIER
+	IDENTIFIANT["booleen"] = TYPE_BOOLEEN
+
+	# Conditions et boucle:
+	IDENTIFIANT["sinon\ si"] = CONDITION_SINON_SI # Mis en n°1 car si on met si ou sinon devant, il detectera pas la condition 
+	IDENTIFIANT["sinon"] = CONDITION_SINON # Mis en n°2 car dans sinon il y a "si" donc il detectera pas si on l'aurais mis en n°3 
+	IDENTIFIANT["si"] = CONDITION_SI
+	IDENTIFIANT["tantque"] = TANT_QUE
+
+	# Retour:
+	IDENTIFIANT["retourner"] = RETOURNER
+
+	# Logique :
+	IDENTIFIANT["et"] = ET
+	IDENTIFIANT["ou"] = OU
+	IDENTIFIANT["non"] = NON
+
 	
 	#Syntaxe des commentaires à ignorer
 	ignore_comment = r'\#.*'
