@@ -52,7 +52,7 @@ class FloLexer(Lexer):
 	IDENTIFIANT["booleen"] = TYPE_BOOLEEN
 
 	# Conditions et boucle:
-	IDENTIFIANT["sinon\ si"] = CONDITION_SINON_SI # Mis en n°1 car si on met si ou sinon devant, il detectera pas la condition 
+	IDENTIFIANT[r'sinon si'] = CONDITION_SINON_SI # Mis en n°1 car si on met si ou sinon devant, il detectera pas la condition 
 	IDENTIFIANT["sinon"] = CONDITION_SINON # Mis en n°2 car dans sinon il y a "si" donc il detectera pas si on l'aurais mis en n°3 
 	IDENTIFIANT["si"] = CONDITION_SI
 	IDENTIFIANT["tantque"] = TANT_QUE

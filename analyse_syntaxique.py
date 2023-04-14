@@ -32,12 +32,16 @@ class FloParser(Parser):
 	@_('ECRIRE "(" expr ")" ";"')
 	def ecrire(self, p):
 		return arbre_abstrait.Ecrire(p.expr) #p.expr = p[2]
+
+	@_('facteur')
+	def expr(self, p):
+		return p.facteur
 		
 	@_('expr "+" expr')
 	def expr(self, p):
 		return arbre_abstrait.Operation('+',p[0],p[2])
 
-	@_('expr "*" expr')
+	@_('expr "*" facteur')
 	def expr(self, p):
 		return arbre_abstrait.Operation('*',p[0],p[2])
 
@@ -46,12 +50,12 @@ class FloParser(Parser):
 		return p.expr #ou p[1]
 		
 	@_('ENTIER')
-	def expr(self, p):
+	def facteur(self, p):
 		return arbre_abstrait.Entier(p.ENTIER) #p.ENTIER = p[0]
 
 if __name__ == '__main__':
 	lexer = FloLexer()
-	parser = FloParser().debugfile
+	parser = FloParser()
 	if len(sys.argv) < 2:
 		print("usage: python3 analyse_syntaxique.py NOM_FICHIER_SOURCE.flo")
 	else:
