@@ -3,13 +3,13 @@ from sly import Lexer
 
 class FloLexer(Lexer):
 	# Noms des lexèmes (sauf les litéraux). En majuscule. Ordre non important
-	tokens = { IDENTIFIANT, TYPE_ENTIER, TYPE_BOOLEEN, ENTIER, BOOLEAN, ECRIRE, LIRE, INFERIEUR_OU_EGAL, SUPERIEUR_OU_EGAL, INFERIEUR, SUPERIEUR, EGAL, PAS_EGAL,
+	tokens = { IDENTIFIANT, TYPE_ENTIER, TYPE_BOOLEEN, ENTIER, BOOLEAN, ECRIRE, LIRE, INFERIEUR_OU_EGAL, SUPERIEUR_OU_EGAL, INFERIEUR, SUPERIEUR, EGAL, DIFFERENT,
 	 ET, OU, NON, CONDITION_SI, CONDITION_SINON, CONDITION_SINON_SI, TANT_QUE, RETOURNER}
 
-	#Les caractères litéraux sont des caractères uniques qui sont retournés tel quel quand rencontré par l'analyse lexicale. 
-	#Les litéraux sont vérifiés en dernier, après toutes les autres règles définies par des expressions régulières.
-	#Donc, si une règle commence par un de ces littérals (comme INFERIEUR_OU_EGAL), cette règle aura la priorité.
-	literals = { '+','*','(',')', '-', '/', '%', ',', ';', '{', '}', '='}
+	# Les caractères litéraux sont des caractères uniques qui sont retournés tel quel quand rencontré par l'analyse lexicale. 
+	# Les litéraux sont vérifiés en dernier, après toutes les autres règles définies par des expressions régulières.
+	# Donc, si une règle commence par un de ces littérals (comme INFERIEUR_OU_EGAL), cette règle aura la priorité.
+	literals = { '+', '*', '(', ')', '-', '/', '%', ',', ';', '{', '}', '=' }
 
 
 	# chaines contenant les caractère à ignorer. Ici espace et tabulation
@@ -23,7 +23,7 @@ class FloLexer(Lexer):
 	INFERIEUR = r"<"
 	SUPERIEUR = r">"
 	EGAL = r"=="
-	PAS_EGAL = r"!="
+	DIFFERENT = r"!="
 
 
 	# Type :
@@ -41,7 +41,7 @@ class FloLexer(Lexer):
 		return t
 
 	# cas général
-	IDENTIFIANT = r'[a-zA-Z][a-zA-Z0-9_]*' #en général, variable ou nom de fonction
+	IDENTIFIANT = r'[a-zA-Z][a-zA-Z0-9_]*' # en général, variable ou nom de fonction
 
 	# cas spéciaux:
 	IDENTIFIANT["ecrire"] = ECRIRE
@@ -52,8 +52,7 @@ class FloLexer(Lexer):
 	IDENTIFIANT["booleen"] = TYPE_BOOLEEN
 
 	# Conditions et boucle:
-	IDENTIFIANT["sinon\ si"] = CONDITION_SINON_SI # Mis en n°1 car si on met si ou sinon devant, il detectera pas la condition 
-	IDENTIFIANT["sinon"] = CONDITION_SINON # Mis en n°2 car dans sinon il y a "si" donc il detectera pas si on l'aurais mis en n°3 
+	IDENTIFIANT["sinon"] = CONDITION_SINON # Mis en n°1 car dans sinon il y a "si" donc il detectera pas si on l'avait mis en n°2
 	IDENTIFIANT["si"] = CONDITION_SI
 	IDENTIFIANT["tantque"] = TANT_QUE
 
@@ -66,7 +65,7 @@ class FloLexer(Lexer):
 	IDENTIFIANT["non"] = NON
 
 	
-	#Syntaxe des commentaires à ignorer
+	# Syntaxe des commentaires à ignorer
 	ignore_comment = r'\#.*'
 
 	# Permet de conserver les numéros de ligne. Utile pour les messages d'erreurs
