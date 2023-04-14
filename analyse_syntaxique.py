@@ -40,14 +40,30 @@ class FloParser(Parser):
 	@_('expr "+" produit')
 	def expr(self, p):
 		return arbre_abstrait.Operation('+',p[0],p[2])
+	
+	@_('expr "-" produit')
+	def expr(self, p):
+		return arbre_abstrait.Operation('-', p[0], p[2])
 
 	@_('facteur')
 	def produit(self, p):
 		return p.facteur
 
+	@_('"-" facteur')
+	def produit(self, p):
+		return arbre_abstrait.Operation("*", arbre_abstrait.Entier(-1), p[1])
+
 	@_('produit "*" facteur')
 	def produit(self, p):
 		return arbre_abstrait.Operation('*',p[0],p[2])
+
+	@_('produit "/" facteur')
+	def produit(self, p):
+		return arbre_abstrait.Operation('/', p[0], p[2])
+
+	@_('produit "%" facteur')
+	def produit(self, p):
+		return arbre_abstrait.Operation('%', p[0], p[2])
 		
 	@_('ENTIER')
 	def facteur(self, p):
