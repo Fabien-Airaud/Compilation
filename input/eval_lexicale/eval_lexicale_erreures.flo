@@ -1,0 +1,7 @@
+entier min(entier entier1, entier entier2) {
+    retourner (entier1 < entier2) ? entier1 : entier2;
+}
+
+entier entier_32 = 32;
+entier entier_4 = 4;
+ecrire(min(entier_32, entier_4));

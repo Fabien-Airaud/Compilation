@@ -1,0 +1,19 @@
+entier entier_1;
+entier_1 = 1;
+entier entier_3 = 1 + 2 - 4 * (-3);
+booleen boolean_true = Vrai;
+tantque(entier_3 >= entier_1) {
+    si (entier_3 % 5 == 0) {
+        entier_3 = entier_3 - 5;
+    } sinon si (entier_3 > entier_1 * 2) {
+        entier_3 = entier_3 / 2;
+    }
+    sinon {
+        entier_3 = entier_3 - 1;
+    }
+}
+si (boolean_true) {
+    retourner Vrai;
+} sinon {
+    retourner Faux;
+}

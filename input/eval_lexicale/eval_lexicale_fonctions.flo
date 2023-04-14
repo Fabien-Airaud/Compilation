@@ -1,0 +1,10 @@
+entier min(entier entier1, entier entier2) {
+    si (entier1 < entier2) {
+        retourner entier1;
+    }
+    retourner entier2;
+}
+
+booleen estFaux(booleen boolean) {
+    retourner non boolean;
+}
