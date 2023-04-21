@@ -1,0 +1,2 @@
+ecrire(a + 3 + lire());
+ecrire(test());

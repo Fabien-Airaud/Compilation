@@ -69,9 +69,38 @@ class FloParser(Parser):
 	def facteur(self, p):
 		return arbre_abstrait.Entier(p.ENTIER) #p.ENTIER = p[0]
 
+	@_('IDENTIFIANT')
+	def facteur(self, p):
+		return arbre_abstrait.Variable(p.IDENTIFIANT)
+
+	@_('LIRE "(" ")" ')
+	def facteur(self, p):
+		return arbre_abstrait.Lire()
+
 	@_('"(" expr ")"')
 	def facteur(self, p):
 		return p.expr #ou p[1]
+	
+	@_('IDENTIFIANT "(" arglist ")"')
+	def facteur(self, p):
+		return arbre_abstrait.Fonction(p[0],p[2])
+	
+	@_('IDENTIFIANT "(" ")"')
+	def facteur(self, p):
+		return arbre_abstrait.Fonction(p[0], None)
+	
+	@_('expr')
+	def arglist(self, p):
+		l = arbre_abstrait.listArguments()
+		l.arguments.append(p[0])
+		return l
+
+	@_('expr "," arglist')
+	def arglist(self, p):
+		p[2].arguments.append(p[0])
+		return p[2]
+		
+
 
 if __name__ == '__main__':
 	lexer = FloLexer()

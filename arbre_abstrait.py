@@ -20,7 +20,14 @@ class ListeInstructions:
 		for instruction in self.instructions:
 			instruction.afficher(indent+1)
 		afficher("</listeInstructions>",indent)
-			
+
+class Lire:
+	def __init__(self):
+		pass
+	def afficher(self, indent=0):
+		afficher("<lire>", indent)
+		afficher("</lire>", indent)
+
 class Ecrire:
 	def __init__(self,exp):
 		self.exp = exp
@@ -40,8 +47,34 @@ class Operation:
 		self.exp1.afficher(indent+1)
 		self.exp2.afficher(indent+1)
 		afficher("</operation>",indent)
+
 class Entier:
 	def __init__(self,valeur):
 		self.valeur = valeur
 	def afficher(self,indent=0):
 		afficher("[Entier:"+str(self.valeur)+"]",indent)
+
+class Variable:
+	def __init__(self, variable):
+		self.variable = variable
+	def afficher(self, indent=0):
+		afficher("[Variable:"+self.variable+"]", indent)
+
+class Fonction:
+	def __init__(self, nomFonction, listArguments):
+		self.nomFonction = nomFonction
+		self.listArguments = listArguments
+	def afficher(self, indent=0):
+		afficher("<"+self.nomFonction+">", indent)
+		if (self.listArguments != None):
+			self.listArguments.afficher(indent + 1)
+		afficher("<" + self.nomFonction + "/>", indent)
+
+class listArguments:
+	def __init__(self):
+		self.arguments = []
+	def afficher(self, indent=0):
+		afficher("<listArgument>", indent)
+		for argument in self.arguments:
+			argument.afficher(indent + 1)
+		afficher("</listArgument>", indent)
