@@ -48,6 +48,18 @@ class Operation:
 		self.exp2.afficher(indent+1)
 		afficher("</operation>",indent)
 
+class Comparaison:
+	def __init__(self, comparateur, exp1, exp2):
+		self.exp1 = exp1
+		self.comparateur = comparateur 
+		self.exp2 = exp2
+	def afficher(self, indent=0):
+		afficher("<comparaison>", indent)
+		afficher(self.comparateur, indent + 1)
+		self.exp1.afficher(indent+1)
+		self.exp2.afficher(indent+1)
+		afficher("</comparaison>", indent)
+
 class Entier:
 	def __init__(self,valeur):
 		self.valeur = valeur
@@ -83,9 +95,9 @@ class listArguments:
 	def __init__(self):
 		self.arguments = []
 	def afficher(self, indent=0):
-		i = 0
+		i = len(self.arguments) - 1
 		for argument in self.arguments:
 			afficher("<argument " + str(i) + '>', indent)
 			argument.afficher(indent + 2)
 			afficher("<argument " + str(i) + '/>', indent)
-			i += 1
+			i -= 1

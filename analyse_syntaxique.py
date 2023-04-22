@@ -49,37 +49,41 @@ class FloParser(Parser):
 	def booleen(self, p):
 		return p.somme
 
+	@_('comparaison')
+	def booleen(self, p):
+		return p.comparaison
+	
+	@_('somme SUPERIEUR somme',
+	'somme INFERIEUR somme',
+	'somme SUPERIEUR_OU_EGAL somme',
+	'somme INFERIEUR_OU_EGAL somme',
+	'somme EGAL somme',
+	'somme DIFFERENT somme')
+	def comparaison(self, p):
+		return arbre_abstrait.Comparaison(p[1], p[0], p[2])
+
 	@_('produit')
 	def somme(self, p):
 		return p.produit
 	
-	@_('somme "+" produit')
+	@_('somme "+" produit',
+	'somme "-" produit')
 	def somme(self, p):
-		return arbre_abstrait.Operation("+", p[0], p[2])
-
-	@_('somme "-" produit')
-	def somme(self, p):
-		return arbre_abstrait.Operation("-", p[0], p[2])
+		return arbre_abstrait.Operation(p[1], p[0], p[2])
 	
 	@_('facteur')
 	def produit(self, p):
 		return p.facteur
 	
-	@_('produit "*" facteur')
+	@_('produit "*" facteur',
+	'produit "/" facteur',
+	'produit "%" facteur')
 	def produit(self, p):
-		return arbre_abstrait.Operation("*", p[0], p[2])
+		return arbre_abstrait.Operation(p[1], p[0], p[2])
 	
 	@_('"-" facteur')
 	def produit(self, p):
 		return arbre_abstrait.Operation("*", arbre_abstrait.Entier(-1), p[1])
-	
-	@_('produit "/" facteur')
-	def produit(self, p):
-		return arbre_abstrait.Operation("/", p[0], p[2])
-
-	@_('produit "%" facteur')
-	def produit(self, p):
-		return arbre_abstrait.Operation("%", p[0], p[2])
 
 	@_('variable')
 	def facteur(self, p):

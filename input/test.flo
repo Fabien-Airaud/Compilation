@@ -1,1 +1,1 @@
-ecrire(test(Vrai, a+5));
+ecrire(test(Vrai, 5 > 2, 4 == 3, 2 != 5, 12 >= 3, 14 <= 16, 1 + 3 < 2 + 7));
