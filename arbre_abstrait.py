@@ -81,6 +81,19 @@ class Variable:
 	def afficher(self, indent=0):
 		afficher("[Variable:"+self.variable+"]", indent)
 
+class OperateurLogique:
+	def __init__(self, opLogique, booleen1, booleen2=None):
+		self.opLogique = opLogique
+		self.booleen1 = booleen1
+		self.booleen2 = booleen2
+	def afficher(self, indent=0):
+		afficher("<operateurLogique>", indent)
+		afficher(self.opLogique, indent + 1)
+		self.booleen1.afficher(indent + 1)
+		if (self.booleen2 != None):
+			self.booleen2.afficher(indent + 1)
+		afficher("</operateurLogique>", indent)
+
 class Fonction:
 	def __init__(self, nomFonction, listArguments):
 		self.nomFonction = nomFonction
@@ -89,7 +102,7 @@ class Fonction:
 		afficher("<fonction: "+self.nomFonction+">", indent)
 		if (self.listArguments != None):
 			self.listArguments.afficher(indent + 1)
-		afficher("<fonction: " + self.nomFonction + "/>", indent)
+		afficher("</fonction: " + self.nomFonction + '>', indent)
 
 class listArguments:
 	def __init__(self):
@@ -99,5 +112,5 @@ class listArguments:
 		for argument in self.arguments:
 			afficher("<argument " + str(i) + '>', indent)
 			argument.afficher(indent + 2)
-			afficher("<argument " + str(i) + '/>', indent)
+			afficher("</argument " + str(i) + '>', indent)
 			i -= 1

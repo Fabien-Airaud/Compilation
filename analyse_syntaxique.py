@@ -33,8 +33,32 @@ class FloParser(Parser):
 	def ecrire(self, p):
 		return arbre_abstrait.Ecrire(p.expr) #p.expr = p[2]
 
-	@_('booleen')
+	@_('negation')
 	def expr(self, p):
+		return p.negation
+	
+	@_('NON disjonction')
+	def negation(self, p):
+		return arbre_abstrait.OperateurLogique(p[0], p.disjonction)
+	
+	@_('disjonction')
+	def negation(self, p):
+		return p.disjonction
+	
+	@_('conjonction ET conjonction')
+	def disjonction(self, p):
+		return arbre_abstrait.OperateurLogique(p[1], p[0], p[2])
+	
+	@_('conjonction')
+	def disjonction(self, p):
+		return p.conjonction
+	
+	@_('booleen OU booleen')
+	def conjonction(self, p):
+		return arbre_abstrait.OperateurLogique(p[1], p[0], p[2])
+	
+	@_('booleen')
+	def conjonction(self, p):
 		return p.booleen
 
 	@_('VRAI')
