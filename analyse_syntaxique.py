@@ -19,7 +19,7 @@ class FloParser(Parser):
 		l = arbre_abstrait.ListeInstructions()
 		l.instructions.append(p[0])
 		return l
-					
+
 	@_('instruction listeInstructions')
 	def listeInstructions(self, p):
 		p[1].instructions.append(p[0])
@@ -33,46 +33,62 @@ class FloParser(Parser):
 	def ecrire(self, p):
 		return arbre_abstrait.Ecrire(p.expr) #p.expr = p[2]
 
-	@_('produit')
+	@_('booleen')
 	def expr(self, p):
-		return p.produit
+		return p.booleen
 
-	@_('expr "+" produit')
-	def expr(self, p):
-		return arbre_abstrait.Operation('+',p[0],p[2])
+	@_('VRAI')
+	def booleen(self, p):
+		return arbre_abstrait.Booleen(p[0])
 	
-	@_('expr "-" produit')
-	def expr(self, p):
-		return arbre_abstrait.Operation('-', p[0], p[2])
+	@_('FAUX')
+	def booleen(self, p):
+		return arbre_abstrait.Booleen(p[0])
+	
+	@_('somme')
+	def booleen(self, p):
+		return p.somme
 
+	@_('produit')
+	def somme(self, p):
+		return p.produit
+	
+	@_('somme "+" produit')
+	def somme(self, p):
+		return arbre_abstrait.Operation("+", p[0], p[2])
+
+	@_('somme "-" produit')
+	def somme(self, p):
+		return arbre_abstrait.Operation("-", p[0], p[2])
+	
 	@_('facteur')
 	def produit(self, p):
 		return p.facteur
-
+	
+	@_('produit "*" facteur')
+	def produit(self, p):
+		return arbre_abstrait.Operation("*", p[0], p[2])
+	
 	@_('"-" facteur')
 	def produit(self, p):
 		return arbre_abstrait.Operation("*", arbre_abstrait.Entier(-1), p[1])
-
-	@_('produit "*" facteur')
-	def produit(self, p):
-		return arbre_abstrait.Operation('*',p[0],p[2])
-
+	
 	@_('produit "/" facteur')
 	def produit(self, p):
-		return arbre_abstrait.Operation('/', p[0], p[2])
+		return arbre_abstrait.Operation("/", p[0], p[2])
 
 	@_('produit "%" facteur')
 	def produit(self, p):
-		return arbre_abstrait.Operation('%', p[0], p[2])
-		
+		return arbre_abstrait.Operation("%", p[0], p[2])
+
+	@_('variable')
+	def facteur(self, p):
+		return p.variable
+
 	@_('ENTIER')
 	def facteur(self, p):
 		return arbre_abstrait.Entier(p.ENTIER) #p.ENTIER = p[0]
-
-	@_('IDENTIFIANT')
-	def facteur(self, p):
-		return arbre_abstrait.Variable(p.IDENTIFIANT)
-
+		
 	@_('LIRE "(" ")" ')
 	def facteur(self, p):
 		return arbre_abstrait.Lire()
@@ -99,7 +115,10 @@ class FloParser(Parser):
 	def arglist(self, p):
 		p[2].arguments.append(p[0])
 		return p[2]
-		
+
+	@_('IDENTIFIANT')
+	def variable(self, p):
+		return arbre_abstrait.Variable(p.IDENTIFIANT)
 
 
 if __name__ == '__main__':

@@ -1,2 +1,1 @@
-ecrire(a + 3 + lire());
-ecrire(test());
+ecrire(test(Vrai, a+5));

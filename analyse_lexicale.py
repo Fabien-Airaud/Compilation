@@ -3,7 +3,7 @@ from sly import Lexer
 
 class FloLexer(Lexer):
 	# Noms des lexèmes (sauf les litéraux). En majuscule. Ordre non important
-	tokens = { IDENTIFIANT, TYPE_ENTIER, TYPE_BOOLEEN, ENTIER, BOOLEAN, ECRIRE, LIRE, INFERIEUR_OU_EGAL, SUPERIEUR_OU_EGAL, INFERIEUR, SUPERIEUR, EGAL, DIFFERENT,
+	tokens = { IDENTIFIANT, TYPE_ENTIER, TYPE_BOOLEEN, ENTIER, VRAI, FAUX, ECRIRE, LIRE, INFERIEUR_OU_EGAL, SUPERIEUR_OU_EGAL, INFERIEUR, SUPERIEUR, EGAL, DIFFERENT,
 	 ET, OU, NON, CONDITION_SI, CONDITION_SINON, CONDITION_SINON_SI, TANT_QUE, RETOURNER}
 
 	# Les caractères litéraux sont des caractères uniques qui sont retournés tel quel quand rencontré par l'analyse lexicale. 
@@ -32,14 +32,6 @@ class FloLexer(Lexer):
 		t.value = int(t.value)
 		return t
 
-	@_(r'Vrai|Faux')
-	def BOOLEEN(self, t):
-		if(str(t.value) == "Vrai"):
-			t.value = int(1)
-		else:
-			t.value = int(0)
-		return t
-
 	# cas général
 	IDENTIFIANT = r'[a-zA-Z][a-zA-Z0-9_]*' # en général, variable ou nom de fonction
 
@@ -50,6 +42,9 @@ class FloLexer(Lexer):
 	# Type:
 	IDENTIFIANT["entier"] = TYPE_ENTIER
 	IDENTIFIANT["booleen"] = TYPE_BOOLEEN
+
+	IDENTIFIANT["Vrai"] = VRAI
+	IDENTIFIANT["Faux"] = FAUX
 
 	# Conditions et boucle:
 	IDENTIFIANT["sinon"] = CONDITION_SINON # Mis en n°1 car dans sinon il y a "si" donc il detectera pas si on l'avait mis en n°2

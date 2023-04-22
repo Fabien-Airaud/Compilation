@@ -54,6 +54,15 @@ class Entier:
 	def afficher(self,indent=0):
 		afficher("[Entier:"+str(self.valeur)+"]",indent)
 
+class Booleen:
+	def __init__(self, booleen):
+		self.booleen = booleen
+	def afficher(self, indent=0):
+		temp = '0'
+		if (self.booleen == "Vrai"):
+			temp = '1'
+		afficher("[Booleen:"+temp+']', indent)
+
 class Variable:
 	def __init__(self, variable):
 		self.variable = variable
@@ -65,16 +74,18 @@ class Fonction:
 		self.nomFonction = nomFonction
 		self.listArguments = listArguments
 	def afficher(self, indent=0):
-		afficher("<"+self.nomFonction+">", indent)
+		afficher("<fonction: "+self.nomFonction+">", indent)
 		if (self.listArguments != None):
 			self.listArguments.afficher(indent + 1)
-		afficher("<" + self.nomFonction + "/>", indent)
+		afficher("<fonction: " + self.nomFonction + "/>", indent)
 
 class listArguments:
 	def __init__(self):
 		self.arguments = []
 	def afficher(self, indent=0):
-		afficher("<listArgument>", indent)
+		i = 0
 		for argument in self.arguments:
-			argument.afficher(indent + 1)
-		afficher("</listArgument>", indent)
+			afficher("<argument " + str(i) + '>', indent)
+			argument.afficher(indent + 2)
+			afficher("<argument " + str(i) + '/>', indent)
+			i += 1
