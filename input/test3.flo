@@ -1,0 +1,14 @@
+si ( Vrai ) {
+    abc = 2;
+}
+sinon si (Faux) {
+    abc = 3;
+}
+sinon si (Vrai) {
+    abc = 4;
+}
+sinon {
+    abc = 5;
+}
+
+ecrire(test(a, 3));
