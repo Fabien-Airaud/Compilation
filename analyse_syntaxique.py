@@ -185,18 +185,10 @@ class FloParser(Parser):
 		return p[2]
 	
 	# Expression
-	@_('negation')
-	def expr(self, p):
-		return p.negation
-	
-	@_('NON disjonction')
-	def negation(self, p):
-		return arbre_abstrait.OperationLogique(p[0], p.disjonction)
-	
 	@_('disjonction')
-	def negation(self, p):
+	def expr(self, p):
 		return p.disjonction
-	
+
 	@_('conjonction ET conjonction')
 	def disjonction(self, p):
 		return arbre_abstrait.OperationLogique(p[1], p[0], p[2])
@@ -205,13 +197,23 @@ class FloParser(Parser):
 	def disjonction(self, p):
 		return p.conjonction
 	
-	@_('booleen OU booleen')
+	@_('negation OU negation')
 	def conjonction(self, p):
 		return arbre_abstrait.OperationLogique(p[1], p[0], p[2])
 	
-	@_('booleen')
+	@_('negation')
 	def conjonction(self, p):
+		return p.negation
+	
+	@_('NON booleen')
+	def negation(self, p):
+		return arbre_abstrait.OperationLogique(p[0], p.booleen)
+	
+	@_('booleen')
+	def negation(self, p):
 		return p.booleen
+	
+
 
 	# Booleen
 	@_('VRAI')
