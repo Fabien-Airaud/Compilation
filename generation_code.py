@@ -161,7 +161,7 @@ def gen_operationLogique(operation):
 	
 	code = {"et":"and","ou":"or","non":"not"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
 	if opLog in ['et','ou']:
-		nasm_instruction(code[opLog], "ebx", "", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
+		nasm_instruction(code[opLog], "eax", "ebx", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
 	if opLog == 'not':
 		nasm_instruction(code[opLog], "ebx", "", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
 	nasm_instruction("push",  "eax" , "", "", "empile le résultat");

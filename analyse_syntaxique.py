@@ -213,8 +213,6 @@ class FloParser(Parser):
 	def negation(self, p):
 		return p.booleen
 	
-
-
 	# Booleen
 	@_('VRAI')
 	def booleen(self, p):
