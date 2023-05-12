@@ -100,7 +100,7 @@ class Comparaison:
 		self.exp2.afficher(indent+1)
 		afficher("</comparaison '" + self.comparateur + "'>", indent)
 
-class OperateurLogique:
+class OperationLogique:
 	""" Cette classe fait l'opération logique entre deux expression booléennes """
 	def __init__(self, opLogique: str, booleen1, booleen2=None) -> None:		
 		"""
@@ -117,11 +117,11 @@ class OperateurLogique:
 		self.booleen2 = booleen2
 
 	def afficher(self, indent=0) -> None:
-		afficher("<operateurLogique '" + self.opLogique + "'>", indent)
+		afficher("<OperationLogique '" + self.opLogique + "'>", indent)
 		self.booleen1.afficher(indent + 1)
 		if (self.booleen2 != None):
 			self.booleen2.afficher(indent + 1)
-		afficher("</operateurLogique '" + self.opLogique + "'>", indent)
+		afficher("</OperationLogique '" + self.opLogique + "'>", indent)
 
 # Liste d'arguments des fonctions
 class ListeArguments:

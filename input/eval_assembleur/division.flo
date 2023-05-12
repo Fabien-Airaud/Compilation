@@ -1,0 +1,5 @@
+ecrire(4 / 2);
+ecrire(7 / 2);
+ecrire(5 / 5);
+ecrire(2 / 5);
+ecrire(0 / 5);

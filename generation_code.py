@@ -89,7 +89,7 @@ Affiche le code nasm correspondant au fait d'envoyer la valeur entière d'une ex
 """	
 def gen_ecrire(ecrire):
 	gen_expression(ecrire.exp) #on calcule et empile la valeur d'expression
-	nasm_instruction("pop", "eax", "", "", "") #on dépile la valeur d'expression sur eax
+	nasm_instruction("pop", "eax", "", "", "") #charge l’adresse sinput sur eax
 	nasm_instruction("call", "iprintLF", "", "", "") #on envoie la valeur d'eax sur la sortie standard
 
 """
@@ -99,7 +99,13 @@ def gen_expression(expression):
 	if type(expression) == arbre_abstrait.Operation:
 		gen_operation(expression) #on calcule et empile la valeur de l'opération
 	elif type(expression) == arbre_abstrait.Entier:
-      		nasm_instruction("push", str(expression.valeur), "", "", "") ; #on met sur la pile la valeur entière			
+      		nasm_instruction("push", str(expression.valeur), "", "", "") ; #on met sur la pile la valeur entière
+	elif type(expression) == arbre_abstrait.Lire:
+		gen_lire()
+	elif type(expression) == arbre_abstrait.Booleen:
+			nasm_instruction("push", "1" if (str(expression.booleen) == "Vrai") else "0", "", "", "") ; #on met sur la pile la valeur booléenne
+	elif type(expression) == arbre_abstrait.OperationLogique:
+		gen_operationLogique(expression) #on calcule et empile la valeur de l'opération logique
 	else:
 		print("type d'expression inconnu",type(expression))
 		exit(0)
@@ -113,17 +119,52 @@ def gen_operation(operation):
 		
 	gen_expression(operation.exp1) #on calcule et empile la valeur de exp1
 	gen_expression(operation.exp2) #on calcule et empile la valeur de exp2
-	
+
 	nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
 	nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
 	
-	code = {"+":"add","*":"imul"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
+	code = {"+":"add","*":"imul","-":"sub","/":"idiv","%":"idiv"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
 	#Voir: https://www.bencode.net/blob/nasmcheatsheet.pdf
-	if op in ['+']:
+	if op in ['+', '-']:
 		nasm_instruction(code[op], "eax", "ebx", "", "effectue l'opération eax" +op+"ebx et met le résultat dans eax" )
 	if op == '*':
 		nasm_instruction(code[op], "ebx", "", "", "effectue l'opération eax" +op+"ebx et met le résultat dans eax" )
-	nasm_instruction("push",  "eax" , "", "", "empile le résultat");	
+	if op == '/':
+		nasm_instruction("mov",  "edx" , "0", "", "initialise edx à 0");
+		nasm_instruction(code[op], "ebx", "", "", "effectue l'opération eax" +op+"ebx, met le résultat dans eax et le reste dans edx" )
+	if op == '%':
+		nasm_instruction("mov",  "edx" , "0", "", "initialise edx à 0");
+		nasm_instruction(code[op], "ebx", "", "", "effectue l'opération eax" +op+"ebx, met le résultat dans edx" )
+		nasm_instruction("mov",  "eax" , "edx", "", "copie edx dans eax");
+	nasm_instruction("push",  "eax" , "", "", "empile le résultat");
+
+"""
+Affiche le code nasm correspondant au fait de lire et enregistrer la valeur entière d'une expression sur l'entrée standard
+"""	
+def gen_lire():
+	nasm_instruction("mov", "eax", "sinput", "", "") #on dépile la valeur d'expression sur eax
+	nasm_instruction("call", "readline", "", "", "attend une chaine de caractères sur l'entrée standard") #appelle la procédure readline de io.asm
+	nasm_instruction("call", "atoi", "", "", "convertit la chaine en entier et la place dans eax") #appelle la procédure atoi de io.asm
+	nasm_instruction("push", "eax", "", "", "empile l'entier")
+
+"""
+Affiche le code nasm pour calculer l'opération logique et la mettre en haut de la pile
+"""
+def gen_operationLogique(operation):
+	opLog = operation.opLogique
+		
+	gen_expression(operation.booleen1) #on calcule et empile la valeur de booleen1
+	gen_expression(operation.booleen2) #on calcule et empile la valeur de booleen2
+
+	nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
+	nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
+	
+	code = {"et":"and","ou":"or","non":"not"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
+	if opLog in ['et','ou']:
+		nasm_instruction(code[opLog], "ebx", "", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
+	if opLog == 'not':
+		nasm_instruction(code[opLog], "ebx", "", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
+	nasm_instruction("push",  "eax" , "", "", "empile le résultat");
 
 
 if __name__ == "__main__":
