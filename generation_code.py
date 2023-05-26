@@ -154,8 +154,15 @@ Affiche le code nasm pour calculer l'opération logique et la mettre en haut de 
 def gen_operationLogique(operation):
 	opLog = operation.opLogique
 	
+	if not check_booleen(operation.booleen1):
+		raise TypeError("Element pas de type booléen dans une opération logique")
+	
+
 	gen_expression(operation.booleen1) #on calcule et empile la valeur de booleen1
 	if opLog != 'non':
+		if not check_booleen(operation.booleen2):
+			raise TypeError("Element pas de type booléen dans une opération logique")
+		
 		gen_expression(operation.booleen2) #on calcule et empile la valeur de booleen2
 		nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
 	
@@ -167,6 +174,10 @@ def gen_operationLogique(operation):
 	if opLog == 'non':
 		nasm_instruction(code[opLog], "eax", "1", "", "effectue l'opération eax" +opLog+"1 et met le résultat dans eax" )
 	nasm_instruction("push",  "eax" , "", "", "empile le résultat");
+
+def check_booleen(booleen):
+	tB = type(booleen)
+	return (tB == arbre_abstrait.Booleen) or (tB == arbre_abstrait.OperationLogique) or (tB == arbre_abstrait.Comparaison)
 
 
 if __name__ == "__main__":
