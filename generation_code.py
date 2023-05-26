@@ -49,6 +49,7 @@ def nasm_instruction(opcode, op1="", op2="", op3="", comment=""):
 Retourne le nom d'une nouvelle étiquette
 """
 def nasm_nouvelle_etiquette():
+	global num_etiquette_courante
 	num_etiquette_courante+=1
 	return "e"+str(num_etiquette_courante)
 
@@ -152,18 +153,19 @@ Affiche le code nasm pour calculer l'opération logique et la mettre en haut de 
 """
 def gen_operationLogique(operation):
 	opLog = operation.opLogique
-		
+	
 	gen_expression(operation.booleen1) #on calcule et empile la valeur de booleen1
-	gen_expression(operation.booleen2) #on calcule et empile la valeur de booleen2
-
-	nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
+	if opLog != 'non':
+		gen_expression(operation.booleen2) #on calcule et empile la valeur de booleen2
+		nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
+	
 	nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
 	
-	code = {"et":"and","ou":"or","non":"not"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
+	code = {"et":"and","ou":"or","non":"xor"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
 	if opLog in ['et','ou']:
 		nasm_instruction(code[opLog], "eax", "ebx", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
-	if opLog == 'not':
-		nasm_instruction(code[opLog], "ebx", "", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
+	if opLog == 'non':
+		nasm_instruction(code[opLog], "eax", "1", "", "effectue l'opération eax" +opLog+"1 et met le résultat dans eax" )
 	nasm_instruction("push",  "eax" , "", "", "empile le résultat");
 
 
