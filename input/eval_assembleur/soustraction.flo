@@ -1,7 +1,7 @@
-ecrire(3 - 2);
-ecrire(2 - 3);
-ecrire(0 - 0);
-ecrire(1 - 1);
-ecrire(0 - 1);
-ecrire(-1);
-ecrire(- 4);
+ecrire(3 - 2); # 1
+ecrire(2 - 3); # -1
+ecrire(0 - 0); # 0
+ecrire(1 - - 1); # 2
+ecrire(0 - 1); # -1
+ecrire(-1); # -1
+ecrire(- 4); # -4

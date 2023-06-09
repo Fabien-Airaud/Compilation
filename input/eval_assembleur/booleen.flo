@@ -1,2 +1,2 @@
-ecrire(Vrai);
-ecrire(Faux);
+ecrire(Vrai); # 1
+ecrire(Faux); # 0

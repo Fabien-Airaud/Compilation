@@ -91,7 +91,7 @@ class Comparaison:
 		"""
 
 		self.exp1 = exp1
-		self.comparateur = comparateur 
+		self.comparateur = comparateur
 		self.exp2 = exp2
 
 	def afficher(self, indent=0) -> None:

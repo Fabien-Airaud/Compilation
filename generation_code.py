@@ -107,6 +107,8 @@ def gen_expression(expression):
 			nasm_instruction("push", "1" if (str(expression.booleen) == "Vrai") else "0", "", "", "") ; #on met sur la pile la valeur booléenne
 	elif type(expression) == arbre_abstrait.OperationLogique:
 		gen_operationLogique(expression) #on calcule et empile la valeur de l'opération logique
+	elif type(expression) == arbre_abstrait.Comparaison:
+		gen_comparaison(expression) #on calcule et empile la valeur de la comparaison
 	else:
 		print("type d'expression inconnu",type(expression))
 		exit(0)
@@ -168,7 +170,7 @@ def gen_operationLogique(operation):
 	
 	nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
 	
-	code = {"et":"and","ou":"or","non":"xor"} #Un dictionnaire qui associe à chaque opérateur sa fonction nasm
+	code = {"et":"and","ou":"or","non":"xor"} # Un dictionnaire qui associe à chaque opérateur sa fonction nasm
 	if opLog in ['et','ou']:
 		nasm_instruction(code[opLog], "eax", "ebx", "", "effectue l'opération eax" +opLog+"ebx et met le résultat dans eax" )
 	if opLog == 'non':
@@ -178,6 +180,43 @@ def gen_operationLogique(operation):
 def check_booleen(booleen):
 	tB = type(booleen)
 	return (tB == arbre_abstrait.Booleen) or (tB == arbre_abstrait.OperationLogique) or (tB == arbre_abstrait.Comparaison)
+
+
+"""
+Affiche le code nasm pour calculer une comparaison et la mettre en haut de la pile
+"""
+def gen_comparaison(operation):
+	expr1 = operation.exp1
+	expr2 = operation.exp2
+	opComp = operation.comparateur
+
+	if not (check_entier(expr1) and check_entier(expr2)):
+		raise TypeError("Element pas de type entier dans une comparaison")
+
+	gen_expression(expr1) #on calcule et empile la valeur de expr1
+	nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
+
+	gen_expression(expr2) #on calcule et empile la valeur de expr2
+	nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
+
+	nasm_instruction("cmp", "eax", "ebx", "", "compare eax avec ebx")
+
+	code = {"<":"jl",">":"jg","==":"je","<=":"jle",">=":"jge","!=":"je"} # Un dictionnaire qui associe à chaque opérateur sa fonction nasm
+	etiquette1 = nasm_nouvelle_etiquette()
+	etiquette2 = nasm_nouvelle_etiquette()
+
+	nasm_instruction(code[opComp], etiquette1, "", "", "fait un saut vers l'étiquette " + etiquette1)
+	nasm_instruction("push", "1" if opComp == "!=" else "0", "", "", "")
+	nasm_instruction("jmp", etiquette2, "", "", "fait un saut vers l'étiquette " + etiquette1)
+
+	printifm(etiquette1 + ":") # pour ajouter le label dans le nasm
+	nasm_instruction("push", "0" if opComp == "!=" else "1", "", "", "")
+	printifm(etiquette2 + ":") # pour ajouter le label dans le nasm
+
+
+def check_entier(entier):
+	tE = type(entier)
+	return (tE == arbre_abstrait.Entier) or (tE == arbre_abstrait.Operation) or (tE == arbre_abstrait.Lire)
 
 
 if __name__ == "__main__":
