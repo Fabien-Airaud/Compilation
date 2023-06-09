@@ -1,0 +1,28 @@
+si (Vrai et Faux ou 1 < 2) { # 1
+    ecrire(1);
+} sinon {
+    ecrire(0);
+}
+
+si (5 < 1) {
+    ecrire(1);
+}
+sinon si (Vrai et Faux ou Faux ou 2 + 3 > 2 + 2) {  #####################   problème à corriger
+    ecrire(2);
+}
+sinon {
+    ecrire(0);
+}
+
+si (Faux) { # 0
+    ecrire(1);
+} sinon {
+    ecrire(0);
+}
+
+si (1 == 3 - 2) { # 1
+    ecrire(1);
+}
+
+ecrire(2 + 3 > 2 + 2);
+ecrire((2 + 3) > (2 + 2));  #####################   problème à corriger
