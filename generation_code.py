@@ -2,11 +2,13 @@ import sys
 from analyse_lexicale import FloLexer
 from analyse_syntaxique import FloParser
 import arbre_abstrait
+from table_des_symboles import TableSymbole
 
 num_etiquette_courante = -1 #Permet de donner des noms différents à toutes les étiquettes (en les appelant e0, e1,e2,...)
 
 afficher_table = False
 afficher_nasm = False
+tableSymbole = TableSymbole() 
 """
 Un print qui ne fonctionne que si la variable afficher_table vaut Vrai.
 (permet de choisir si on affiche le code assembleur ou la table des symboles)
@@ -67,6 +69,14 @@ def gen_programme(programme):
     gen_listeInstructions(programme.listeInstructions)
     nasm_instruction("mov", "eax", "1", "", "1 est le code de SYS_EXIT")
     nasm_instruction("int", "0x80", "", "", "exit")
+
+def write_def_fonction(fonction):
+    fonctions = fonction.listeFonctions
+    if (fonctions != None):
+        for defFonction in fonctions.fonctions:
+            tableSymbole.listeTypeFonction.append([defFonction.nom, defFonction.type])
+    
+
 
 """
 Affiche le code nasm correspondant à une suite d'instructions
@@ -252,7 +262,6 @@ def gen_conditionnel(instruction):
     	printifm(etiquette1 + ":") # pour ajouter le label dans le nasm
 
 
-
 def gen_condition(expression):
     if type(expression) == arbre_abstrait.Booleen:
         nasm_instruction("push", "1" if (str(expression.booleen) == "Vrai") else "0", "", "", "")
@@ -265,7 +274,9 @@ def gen_condition(expression):
 
 
 if __name__ == "__main__":
-    afficher_nasm = True
+    afficher_nasm = False
+    afficher_tableSymboles = False
+
     lexer = FloLexer()
     parser = FloParser()
     if len(sys.argv) < 3 or sys.argv[1] not in ["-nasm","-table"]:
@@ -279,6 +290,10 @@ if __name__ == "__main__":
         data = f.read()
         try:
             arbre = parser.parse(lexer.tokenize(data))
-            gen_programme(arbre)
+            write_def_fonction(arbre)
+            if not afficher_tableSymboles:
+                gen_programme(arbre)
         except EOFError:
             exit()
+    if afficher_tableSymboles:
+        tableSymbole.afficher()
