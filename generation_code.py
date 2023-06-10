@@ -196,10 +196,9 @@ def gen_comparaison(operation):
         raise TypeError("Element pas de type entier dans une comparaison")
 
     gen_expression(expr1) #on calcule et empile la valeur de expr1
-    nasm_instruction("pop", "eax", "", "", "dépile la permière operande dans eax")
-
     gen_expression(expr2) #on calcule et empile la valeur de expr2
-    nasm_instruction("pop", "ebx", "", "", "dépile la seconde operande dans ebx")
+    nasm_instruction("pop", "ebx", "", "", "dépile la seconde expression dans ebx")
+    nasm_instruction("pop", "eax", "", "", "dépile la première expression dans eax")
 
     nasm_instruction("cmp", "eax", "ebx", "", "compare eax avec ebx")
 
@@ -251,6 +250,8 @@ def gen_conditionnel(instruction):
             printifm(etiquette2 + ":") # pour ajouter le label dans le nasm
     if nbInstrs > 1:
     	printifm(etiquette1 + ":") # pour ajouter le label dans le nasm
+
+
 
 def gen_condition(expression):
     if type(expression) == arbre_abstrait.Booleen:

@@ -158,7 +158,7 @@ class RetourFonction:
 
 class AppelFonction:
 	""" Celle classe permet d'appeler une fonction avec ou sans arguments """
-	def __init__(self, nomFonction: str, listArguments: ListeArguments | None = None) -> None:
+	def __init__(self, nomFonction: str, listArguments = None) -> None:
 		"""
 		Constructeur de la classe AppelFonction
 
@@ -388,7 +388,7 @@ class ListeFonctions:
 # Programmme à exécuter au départ
 class Programme:
 	""" Classe d'initiation du Programme"""
-	def __init__(self, listeInstructions: ListeInstructions, listeFonctions: ListeFonctions | None = None) -> None:
+	def __init__(self, listeInstructions: ListeInstructions, listeFonctions = None) -> None:
 		"""
 		Constructeur de la classe Programme
 
