@@ -9,3 +9,8 @@ class TableSymbole:
             if name == fonction[0]:
                 return True
         return False
+    def estBonType(self, name, type) -> bool:
+        for fonction in self.listeTypeFonction:
+            if name == fonction[0]:
+                return True if type == fonction[1] else False
+        return False

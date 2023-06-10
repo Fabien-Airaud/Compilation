@@ -88,7 +88,9 @@ def gen_def_fonction(fonctions):
             if type(instruction) != arbre_abstrait.RetourFonction:
                 gen_instruction(instruction)
             else:
-                gen_retourFonction(instruction)
+                exprRetour = gen_retourFonction(instruction)
+                if not tableSymbole.estBonType(fonction.nom, exprRetour):
+                    raise TypeError("Mauvais type de renvoi")
                 count += 1
         
         if count == 0:
@@ -130,6 +132,11 @@ def gen_retourFonction(retour):
     gen_expression(retour.expr)
     nasm_instruction("pop", "eax", "", "", "On met dans eax l'expression de retour")
     nasm_instruction("ret", "", "", "", "On retourne la valeur de eax")
+
+    if check_booleen(retour.expr):
+        return "booleen"
+    else:
+        return "entier"
 
 def gen_fonction(fonction, estInstruction: bool):
     if tableSymbole.find(fonction.nomFonction):
