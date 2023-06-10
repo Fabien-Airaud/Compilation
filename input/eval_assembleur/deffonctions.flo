@@ -9,4 +9,4 @@ booleen h() {
 }
 
 ecrire(f() + g());
-ecrire(non h());
+# ecrire(non h());

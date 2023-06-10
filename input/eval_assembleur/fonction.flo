@@ -1,0 +1,10 @@
+entier f() {
+    retourner 3;
+}
+entier g(){
+    ecrire(120);
+    retourner 0;
+}
+
+ecrire(f());
+g();

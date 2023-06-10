@@ -65,6 +65,9 @@ def gen_programme(programme):
     printifm('v$a:	resd	1')
     printifm('section\t.text')
     printifm('global _start')
+    if programme.listeFonctions != None:
+        gen_def_fonction(programme.listeFonctions)
+
     printifm('_start:')
     gen_listeInstructions(programme.listeInstructions)
     nasm_instruction("mov", "eax", "1", "", "1 est le code de SYS_EXIT")
@@ -76,6 +79,20 @@ def write_def_fonction(fonction):
         for defFonction in fonctions.fonctions:
             tableSymbole.listeTypeFonction.append([defFonction.nom, defFonction.type])
     
+def gen_def_fonction(fonctions):
+    for fonction in fonctions.fonctions:
+        printifm('_' + fonction.nom + ':')
+
+        count = 0
+        for instruction in fonction.listeInstructions.instructions:
+            if type(instruction) != arbre_abstrait.RetourFonction:
+                gen_instruction(instruction)
+            else:
+                gen_retourFonction(instruction)
+                count += 1
+        
+        if count == 0:
+            raise ValueError("Pas de retourner dans la fonction")
 
 
 """
@@ -93,6 +110,10 @@ def gen_instruction(instruction):
         gen_ecrire(instruction)
     elif type(instruction) == arbre_abstrait.Conditionnelle:
         gen_conditionnel(instruction)
+    elif type(instruction) == arbre_abstrait.AppelFonction:
+        gen_fonction(instruction, False)
+    elif type(instruction) == arbre_abstrait.RetourFonction:
+        raise TypeError("Retour pas au bon endroit")
     else:
         print("type instruction inconnu",type(instruction))
         exit(0)
@@ -104,6 +125,20 @@ def gen_ecrire(ecrire):
     gen_expression(ecrire.exp) #on calcule et empile la valeur d'expression
     nasm_instruction("pop", "eax", "", "", "") #charge l’adresse sinput sur eax
     nasm_instruction("call", "iprintLF", "", "", "") #on envoie la valeur d'eax sur la sortie standard
+
+def gen_retourFonction(retour):
+    gen_expression(retour.expr)
+    nasm_instruction("pop", "eax", "", "", "On met dans eax l'expression de retour")
+    nasm_instruction("ret", "", "", "", "On retourne la valeur de eax")
+
+def gen_fonction(fonction, estInstruction: bool):
+    if tableSymbole.find(fonction.nomFonction):
+        nasm_instruction("call", "_" + fonction.nomFonction, "", "", "Appelle la fonction " + fonction.nomFonction)
+        
+        if estInstruction:
+            nasm_instruction("push", "eax", "", "", "Ajoute la valeur de retour de fonction dans la pile")
+    else:
+        raise ValueError("Fonction non existante")
 
 """
 Affiche le code nasm pour calculer et empiler la valeur d'une expression
@@ -121,6 +156,8 @@ def gen_expression(expression):
         gen_operationLogique(expression) #on calcule et empile la valeur de l'opération logique
     elif type(expression) == arbre_abstrait.Comparaison:
         gen_comparaison(expression) #on calcule et empile la valeur de la comparaison
+    elif type(expression) == arbre_abstrait.AppelFonction:
+        gen_fonction(expression, True)
     else:
         print("type d'expression inconnu",type(expression))
         exit(0)
