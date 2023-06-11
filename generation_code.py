@@ -73,12 +73,22 @@ def gen_programme(programme):
     nasm_instruction("mov", "eax", "1", "", "1 est le code de SYS_EXIT")
     nasm_instruction("int", "0x80", "", "", "exit")
 
+def get_Arguments(arguments) -> list:
+    args = []
+    for argument in arguments:
+        args.append(argument.type)
+    return args
+
 def write_def_fonction(fonction):
+    print(type(fonction))
     fonctions = fonction.listeFonctions
     if (fonctions != None):
         for defFonction in fonctions.fonctions:
-            tableSymbole.listeTypeFonction.append([defFonction.nom, defFonction.type])
-    
+            arguments = []
+            if defFonction.listeArguments != None:
+                arguments = get_Arguments(defFonction.listeArguments.listeArguments)
+            tableSymbole.listeTypeFonction.append([defFonction.nom, defFonction.type, len(arguments) * 4, arguments])
+
 def gen_def_fonction(fonctions):
     for fonction in fonctions.fonctions:
         printifm('_' + fonction.nom + ':')
@@ -89,7 +99,7 @@ def gen_def_fonction(fonctions):
                 gen_instruction(instruction)
             else:
                 exprRetour = gen_retourFonction(instruction)
-                if not tableSymbole.estBonType(fonction.nom, exprRetour):
+                if tableSymbole.getFonction(fonction.nom)[1] != exprRetour:
                     raise TypeError("Mauvais type de renvoi")
                 count += 1
         
@@ -138,14 +148,30 @@ def gen_retourFonction(retour):
     else:
         return "entier"
 
+def check_Fonction(fonctionTableSymbole, fonction):
+    argsFonction = []
+
+    if (fonction.listArguments != None):
+        argsFonction = fonction.listArguments.arguments
+    tailleArgsFonction = len(argsFonction)
+    if (tailleArgsFonction * 4 != fonctionTableSymbole[2]):
+        raise AttributeError("Il manque des arguments ou il y a trop d'arguments")
+    
+    for i in range(tailleArgsFonction):
+        typeArg = "booleen" if check_booleen(argsFonction[i]) else "entier"
+        if typeArg != fonctionTableSymbole[3][i]:
+            raise TypeError("Mauvais type")
+
 def gen_fonction(fonction, estInstruction: bool):
-    if tableSymbole.find(fonction.nomFonction):
-        nasm_instruction("call", "_" + fonction.nomFonction, "", "", "Appelle la fonction " + fonction.nomFonction)
-        
-        if estInstruction:
-            nasm_instruction("push", "eax", "", "", "Ajoute la valeur de retour de fonction dans la pile")
-    else:
+    fonctionTableSymbole = tableSymbole.getFonction(fonction.nomFonction)    
+    if fonctionTableSymbole == None:
         raise ValueError("Fonction non existante")
+    check_Fonction(fonctionTableSymbole, fonction)
+
+    nasm_instruction("call", "_" + fonction.nomFonction, "", "", "Appelle la fonction " + fonction.nomFonction)
+    
+    if estInstruction:
+        nasm_instruction("push", "eax", "", "", "Ajoute la valeur de retour de fonction dans la pile")
 
 """
 Affiche le code nasm pour calculer et empiler la valeur d'une expression
@@ -235,6 +261,9 @@ def gen_operationLogique(operation):
 
 def check_booleen(booleen):
     tB = type(booleen)
+    if tB == arbre_abstrait.AppelFonction:
+        return tableSymbole.estBonType(tB.nomFonction, "booleen")
+    
     return (tB == arbre_abstrait.Booleen) or (tB == arbre_abstrait.OperationLogique) or (tB == arbre_abstrait.Comparaison)
 
 
@@ -271,6 +300,9 @@ def gen_comparaison(operation):
 
 def check_entier(entier):
     tE = type(entier)
+    if tE == arbre_abstrait.AppelFonction:
+        return tableSymbole.estBonType(tE.nomFonction, "entier")
+    
     return (tE == arbre_abstrait.Entier) or (tE == arbre_abstrait.Operation) or (tE == arbre_abstrait.Lire)
 
 """

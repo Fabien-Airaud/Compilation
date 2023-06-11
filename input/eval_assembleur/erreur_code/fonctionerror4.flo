@@ -1,0 +1,4 @@
+booleen f(booleen a) {
+    retourner Vrai;
+}
+ecrire(f(5));
