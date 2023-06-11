@@ -80,7 +80,6 @@ def get_Arguments(arguments) -> list:
     return args
 
 def write_def_fonction(fonction):
-    print(type(fonction))
     fonctions = fonction.listeFonctions
     if (fonctions != None):
         for defFonction in fonctions.fonctions:
