@@ -5,10 +5,14 @@ import arbre_abstrait
 from table_des_symboles import TableSymbole
 
 num_etiquette_courante = -1 #Permet de donner des noms différents à toutes les étiquettes (en les appelant e0, e1,e2,...)
+fonctionCourante = None
+countRetour = 0
 
 afficher_table = False
 afficher_nasm = False
 tableSymbole = TableSymbole() 
+
+
 """
 Un print qui ne fonctionne que si la variable afficher_table vaut Vrai.
 (permet de choisir si on affiche le code assembleur ou la table des symboles)
@@ -89,21 +93,28 @@ def write_def_fonction(fonction):
             tableSymbole.listeTypeFonction.append([defFonction.nom, defFonction.type, len(arguments) * 4, arguments])
 
 def gen_def_fonction(fonctions):
+    global fonctionCourante
+    global count
     for fonction in fonctions.fonctions:
         printifm('_' + fonction.nom + ':')
+        fonctionCourante = fonction.nom
+
+        if (fonction.listeArguments != None):
+            nombre = 4
+            for arg in fonction.listeArguments.listeArguments:
+                tableSymbole.listeVariable.append([arg.nomVariable, arg.type, nombre])
+                nombre += 4
 
         count = 0
         for instruction in fonction.listeInstructions.instructions:
-            if type(instruction) != arbre_abstrait.RetourFonction:
-                gen_instruction(instruction)
-            else:
-                exprRetour = gen_retourFonction(instruction)
-                if tableSymbole.getFonction(fonction.nom)[1] != exprRetour:
-                    raise TypeError("Mauvais type de renvoi")
-                count += 1
+            gen_instruction(instruction)
         
         if count == 0:
             raise ValueError("Pas de retourner dans la fonction")
+
+        tableSymbole.listeVariable = []
+    
+    fonctionCourante = None
 
 
 """
@@ -123,8 +134,10 @@ def gen_instruction(instruction):
         gen_conditionnel(instruction)
     elif type(instruction) == arbre_abstrait.AppelFonction:
         gen_fonction(instruction, False)
+    elif type(instruction) == arbre_abstrait.Boucle:
+        gen_tant_que(instruction)
     elif type(instruction) == arbre_abstrait.RetourFonction:
-        raise TypeError("Retour pas au bon endroit")
+        gen_retourFonction(instruction)
     else:
         print("type instruction inconnu",type(instruction))
         exit(0)
@@ -138,14 +151,19 @@ def gen_ecrire(ecrire):
     nasm_instruction("call", "iprintLF", "", "", "") #on envoie la valeur d'eax sur la sortie standard
 
 def gen_retourFonction(retour):
+    global count
+    count += 1
+
     gen_expression(retour.expr)
     nasm_instruction("pop", "eax", "", "", "On met dans eax l'expression de retour")
     nasm_instruction("ret", "", "", "", "On retourne la valeur de eax")
 
-    if check_booleen(retour.expr):
-        return "booleen"
-    else:
-        return "entier"
+    checkType = "booleen" if check_booleen(retour.expr) else "entier"
+
+    if fonctionCourante == None:
+        raise TypeError("Retour pas au bon endroit")
+    elif not tableSymbole.estBonType(fonctionCourante, checkType):
+        raise TypeError("Type retour pas approprié")
 
 def check_Fonction(fonctionTableSymbole, fonction):
     argsFonction = []
@@ -166,8 +184,26 @@ def gen_fonction(fonction, estInstruction: bool):
     if fonctionTableSymbole == None:
         raise ValueError("Fonction non existante")
     check_Fonction(fonctionTableSymbole, fonction)
+    
+    args = []
+    if (fonction.listArguments != None):
+        args = fonction.listArguments.arguments
 
+    tailleArgs = len(args)
+    nasm_instruction("push", "ebp", "", "", "Empile la valeur de ebp avant de la charger")
+    if args != [] :
+        nasm_instruction("mov", "esi", "esp", "", "Met l'adresse de esp dans esi")
+        for arg in args:
+            gen_expression(arg)
+        nasm_instruction("mov", "ebp", "esi", "", "Met l'adresse de esi dans ebp")
+        nasm_instruction("sub", "esp", str(tailleArgs * 4), "", "Réduit le pointeur de esp dans la pile de 4")
+    
     nasm_instruction("call", "_" + fonction.nomFonction, "", "", "Appelle la fonction " + fonction.nomFonction)
+    
+    if args != []:
+        nasm_instruction("add", "esp", str(tailleArgs * 4), "", "Ajoute le nombre d'argument de la fonction")
+    
+    nasm_instruction("pop", "ebp", "", "", "")
     
     if estInstruction:
         nasm_instruction("push", "eax", "", "", "Ajoute la valeur de retour de fonction dans la pile")
@@ -190,6 +226,8 @@ def gen_expression(expression):
         gen_comparaison(expression) #on calcule et empile la valeur de la comparaison
     elif type(expression) == arbre_abstrait.AppelFonction:
         gen_fonction(expression, True)
+    elif type(expression) == arbre_abstrait.Variable:
+        gen_variable(expression)
     else:
         print("type d'expression inconnu",type(expression))
         exit(0)
@@ -261,7 +299,9 @@ def gen_operationLogique(operation):
 def check_booleen(booleen):
     tB = type(booleen)
     if tB == arbre_abstrait.AppelFonction:
-        return tableSymbole.estBonType(tB.nomFonction, "booleen")
+        return tableSymbole.estBonType(booleen.nomFonction, "booleen")
+    elif tB == arbre_abstrait.Variable:
+        return tableSymbole.estBonTypeVariable(booleen.variable, "booleen")
     
     return (tB == arbre_abstrait.Booleen) or (tB == arbre_abstrait.OperationLogique) or (tB == arbre_abstrait.Comparaison)
 
@@ -300,7 +340,9 @@ def gen_comparaison(operation):
 def check_entier(entier):
     tE = type(entier)
     if tE == arbre_abstrait.AppelFonction:
-        return tableSymbole.estBonType(tE.nomFonction, "entier")
+        return tableSymbole.estBonType(entier.nomFonction, "entier")
+    elif tE == arbre_abstrait.Variable:
+        return tableSymbole.estBonTypeVariable(entier.variable, "entier")
     
     return (tE == arbre_abstrait.Entier) or (tE == arbre_abstrait.Operation) or (tE == arbre_abstrait.Lire)
 
@@ -336,6 +378,28 @@ def gen_conditionnel(instruction):
     if nbInstrs > 1:
     	printifm(etiquette1 + ":") # pour ajouter le label dans le nasm
 
+def gen_tant_que(instruction):
+    if (check_booleen(instruction.expr)):
+        etiquetteDebutBoucle = nasm_nouvelle_etiquette()
+        etiquetteFinBoucle = nasm_nouvelle_etiquette()
+        printifm(etiquetteDebutBoucle + ':')
+        gen_expression(instruction.expr)
+        nasm_instruction("pop", "eax", "", "", "dépile la première operande dans eax")
+        nasm_instruction("cmp", "eax", "0", "", "compare eax avec Faux")
+        nasm_instruction("je", etiquetteFinBoucle, "", "", "fait un saut vers l'étiquette " + etiquetteFinBoucle)
+        gen_listeInstructions(instruction.listeInstruction)
+        nasm_instruction("jmp", etiquetteDebutBoucle, "", "", "retourne au début de la boucle")
+        printifm(etiquetteFinBoucle + ':')
+    else:
+        raise TypeError("Erreur type expression")
+
+def gen_variable(variable):
+    variableTableSymbole = tableSymbole.getVariable(variable.variable)
+    if variableTableSymbole != None:
+        nasm_instruction("mov", "eax", "[ebp - " + str(variableTableSymbole[2]) + "]", "", "Met dans eax la valeur de " + variable.variable)
+        nasm_instruction("push", "eax", "", "", "Met la valeur de eax dans la pile")
+    else:
+        raise AttributeError("Variable non existante dans la table")
 
 def gen_condition(expression):
     if type(expression) == arbre_abstrait.Booleen:
@@ -344,6 +408,11 @@ def gen_condition(expression):
         gen_operationLogique(expression)  #on calcule et empile la valeur de l'opération logique
     elif type(expression) == arbre_abstrait.Comparaison:
         gen_comparaison(expression)  #on calcule et empile la valeur de la comparaison
+    elif type(expression) == arbre_abstrait.Variable:
+        if tableSymbole.estBonTypeVariable(expression.variable, "booleen"):
+            gen_variable(expression)
+        else:
+            raise TypeError("1 Element pas de type booléen dans une expression conditionnelle")
     else:
         raise TypeError("Element pas de type booléen dans une expression conditionnelle")
 

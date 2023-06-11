@@ -1,4 +1,4 @@
-INPUT = exemple1 exemple2 multiplication eval_assembleur/soustraction eval_assembleur/division eval_assembleur/modulo eval_assembleur/lecture eval_assembleur/booleen eval_assembleur/opLogique eval_assembleur/comparaison eval_assembleur/conditionnel eval_assembleur/deffonctions eval_assembleur/fonction # eval_assembleur/fonction2 priorite test test2 test3
+INPUT = exemple1 exemple2 multiplication eval_assembleur/soustraction eval_assembleur/division eval_assembleur/modulo eval_assembleur/lecture eval_assembleur/booleen eval_assembleur/opLogique eval_assembleur/comparaison eval_assembleur/conditionnel eval_assembleur/deffonctions eval_assembleur/fonction eval_assembleur/boucle eval_assembleur/fonction2 # priorite test test2 test3
 ERROR = fonctionerror1 fonctionerror2 fonctionerror3 fonctionerror4 fonctionerror5
 
 all : generation_code_nasm assembleur_vers_exercutable

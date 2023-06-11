@@ -1,0 +1,7 @@
+tantque(Faux) {
+    ecrire(5);
+}
+
+tantque(Vrai) {
+    ecrire(10);
+}

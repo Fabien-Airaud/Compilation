@@ -54,6 +54,8 @@ class Variable:
 
 	def afficher(self, indent=0):
 		afficher("[Variable:"+self.variable+"]", indent)
+	def getVariable(self) -> str:
+		return self.variable
 
 # Operation arithmétique et logique
 class Operation:
